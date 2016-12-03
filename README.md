@@ -24,7 +24,7 @@ import (
 ) 
  
 func main() {
-    h := hc.NewDefault() // or .New(bits, saltLength, extra)
+    h := hc.NewStd() // or .New(bits, saltLength, extra)
     
     // Mint a new stamp
     stamp := hc.Mint("something")
