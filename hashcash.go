@@ -32,8 +32,8 @@ func New(bits uint, saltLen uint, extra string) *Hash {
 	return h
 }
 
-// NewDefault creates a new Hash with 20 bits of collision and 8 bytes of salt chars.
-func NewDefault() *Hash {
+// NewStd creates a new Hash with 20 bits of collision and 8 bytes of salt chars.
+func NewStd() *Hash {
 	return New(20, 8, "")
 }
 

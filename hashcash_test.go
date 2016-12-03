@@ -9,8 +9,8 @@ import (
 	"github.com/catalinc/hashcash"
 )
 
-func TestNewDefault(t *testing.T) {
-	h := hashcash.NewDefault()
+func TestNewStd(t *testing.T) {
+	h := hashcash.NewStd()
 	if h == nil {
 		t.Error("Expected hashcash.Hash, got nil")
 	}
@@ -86,7 +86,7 @@ func TestStampFormat(t *testing.T) {
 var mintAndCheckTests = []string{"abc", "something", "someone@example.net"}
 
 func TestMintAndCheck(t *testing.T) {
-	h := hashcash.NewDefault()
+	h := hashcash.NewStd()
 	for _, r := range mintAndCheckTests {
 		stamp, err := h.Mint(r)
 		if err != nil {
