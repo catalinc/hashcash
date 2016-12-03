@@ -1,12 +1,12 @@
 # hashcash
 
-Implementation of [Hashcash](https://en.wikipedia.org/wiki/Hashcash) version 1 algorithm in Go.
+[Hashcash](https://en.wikipedia.org/wiki/Hashcash) version 1 in Go.
 
 # Installation
 
 `go get github.com/catalinc/hashcash`
 
-To install the command line tool:
+To install the `hc` command line tool:
 
 `cd $GOPATH/github.com/catalin/hashcash/cmd/hc && go install`
 
