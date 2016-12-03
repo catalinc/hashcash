@@ -37,6 +37,7 @@ func NewDefault() *Hash {
 	return New(20, 8, "")
 }
 
+// Date field format
 const dateFormat = "060102"
 
 // Mint a new hashcash stamp for resource.
@@ -59,6 +60,7 @@ func (h *Hash) Mint(resource string) (string, error) {
 }
 
 // Check whether a hashcash stamp is valid.
+// TODO: check timestmap
 func (h *Hash) Check(stamp string) bool {
 	return h.checkZeros(stamp)
 }
@@ -70,7 +72,7 @@ func (h *Hash) getSalt() (string, error) {
 		return "", err
 	}
 	salt := base64.StdEncoding.EncodeToString(buf)
-	return salt, nil
+	return salt[:h.saltLen], nil
 }
 
 func (h *Hash) checkZeros(stamp string) bool {
