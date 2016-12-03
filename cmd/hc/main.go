@@ -9,19 +9,17 @@ import (
 )
 
 var (
-	mint  = flag.String("mint", "", "Mint a new stamp")
-	check = flag.String("check", "", "Check a stamp for validity")
-	bits  = flag.Int("bits", 20, "Specify required collision bits")
+	mint    = flag.String("mint", "", "Mint a new stamp")
+	check   = flag.String("check", "", "Check a stamp for validity")
+	bits    = flag.Uint("bits", 20, "Specify required collision bits")
+	saltLen = flag.Uint("salt", 8, "Salt length")
+	extra   = flag.String("extra", "", "Extra extension to a minted stamp")
 )
 
 func main() {
 	flag.Parse()
 
-	if *bits <= 0 {
-		fmt.Fprintln(os.Stderr, "Invalid value for collision bits")
-		os.Exit(1)
-	}
-	h := hc.New(uint(*bits))
+	h := hc.New(*bits, *saltLen, *extra)
 
 	if *mint != "" {
 		stamp, err := h.Mint(*mint)

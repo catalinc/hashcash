@@ -12,41 +12,46 @@ import (
 	"time"
 )
 
-const (
-	// Bits is the default value for the number of collision bits.
-	Bits = 20
-	// SaltSize is default value for random salt size.
-	SaltSize = 8
-	// DateFormat is default date format.
-	DateFormat = "060102"
-)
-
 // Hash provides an implementation of hashcash v1 algorithm.
 type Hash struct {
-	hasher hash.Hash
-	bits   uint
-	zeros  uint
-	salt   uint
+	hasher  hash.Hash
+	bits    uint
+	zeros   uint
+	saltLen uint
+	extra   string
 }
 
-// New creates a new Hash with 20 bits of collision.
-func New() *Hash {
-	zeros := uint(math.Ceil(float64(defaultBits) / 4.0))
-	return &Hash{hasher: sha1.New(), bits: defaultBits, zeros: zeros, salt: defaultSalt}
+// New creates a new Hash with specified options.
+func New(bits uint, saltLen uint, extra string) *Hash {
+	h := &Hash{
+		hasher:  sha1.New(),
+		bits:    bits,
+		saltLen: saltLen,
+		extra:   extra}
+	h.zeros = uint(math.Ceil(float64(h.bits) / 4.0))
+	return h
 }
+
+// NewDefault creates a new Hash with 20 bits of collision.
+func NewDefault() *Hash {
+	return New(20, 8, "")
+}
+
+const dateFormat = "060102"
 
 // Mint a new hashcash stamp for resource.
 func (h *Hash) Mint(resource string) (string, error) {
-	salt, err := h.computeSalt()
+	salt, err := h.getSalt()
 	if err != nil {
 		return "", err
 	}
-	date := time.Now().Format("060102")
+	date := time.Now().Format(dateFormat)
 	counter := 0
 	var stamp string
 	for {
-		stamp = fmt.Sprintf("1:%d:%s:%s::%s:%x", h.bits, date, resource, salt, counter)
-		if h.check(stamp) {
+		stamp = fmt.Sprintf("1:%d:%s:%s:%s:%s:%x",
+			h.bits, date, resource, h.extra, salt, counter)
+		if h.checkZeros(stamp) {
 			return stamp, nil
 		}
 		counter++
@@ -55,11 +60,11 @@ func (h *Hash) Mint(resource string) (string, error) {
 
 // Check whether a hashcash stamp is valid.
 func (h *Hash) Check(stamp string) bool {
-	return h.check(stamp)
+	return h.checkZeros(stamp)
 }
 
-func (h *Hash) computeSalt() (string, error) {
-	buf := make([]byte, h.salt)
+func (h *Hash) getSalt() (string, error) {
+	buf := make([]byte, h.saltLen)
 	_, err := rand.Read(buf)
 	if err != nil {
 		return "", err
@@ -68,7 +73,7 @@ func (h *Hash) computeSalt() (string, error) {
 	return salt, nil
 }
 
-func (h *Hash) check(stamp string) bool {
+func (h *Hash) checkZeros(stamp string) bool {
 	h.hasher.Reset()
 	h.hasher.Write([]byte(stamp))
 	digest := hex.EncodeToString(h.hasher.Sum(nil))
