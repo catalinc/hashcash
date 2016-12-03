@@ -1,6 +1,6 @@
 # hashcash
 
-[Hashcash](https://en.wikipedia.org/wiki/Hashcash) version 1 in Go.
+Implementation of [Hashcash](https://en.wikipedia.org/wiki/Hashcash) version 1 in Go.
 
 # Installation
 
