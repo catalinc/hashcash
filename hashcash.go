@@ -1,4 +1,4 @@
-// Package hashcash provides an implementation of hashcash version 1 proof-of-work algorithm.
+// Package hashcash provides an implementation of Hashcash version 1 protocol.
 package hashcash
 
 import (
@@ -32,7 +32,7 @@ func New(bits uint, saltLen uint, extra string) *Hash {
 	return h
 }
 
-// NewDefault creates a new Hash with 20 bits of collision.
+// NewDefault creates a new Hash with 20 bits of collision and 8 bytes of salt chars.
 func NewDefault() *Hash {
 	return New(20, 8, "")
 }
