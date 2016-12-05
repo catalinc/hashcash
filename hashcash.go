@@ -1,4 +1,4 @@
-// Package hashcash provides an implementation of Hashcash version 1 protocol.
+// Package hashcash provides an implementation of Hashcash version 1 algorithm.
 package hashcash
 
 import (
@@ -9,16 +9,17 @@ import (
 	"fmt"
 	"hash"
 	"math"
+	"strings"
 	"time"
 )
 
-// Hash provides an implementation of hashcash v1 algorithm.
+// Hash provides an implementation of hashcash v1.
 type Hash struct {
-	hasher  hash.Hash
-	bits    uint
-	zeros   uint
-	saltLen uint
-	extra   string
+	hasher  hash.Hash // SHA-1
+	bits    uint      // Number of zero bits
+	zeros   uint      // Number of zero digits
+	saltLen uint      // Random salt length
+	extra   string    // Extension to add to the minted stamp
 }
 
 // New creates a new Hash with specified options.
@@ -60,8 +61,15 @@ func (h *Hash) Mint(resource string) (string, error) {
 }
 
 // Check whether a hashcash stamp is valid.
-// TODO: check timestmap
 func (h *Hash) Check(stamp string) bool {
+	if h.checkDate(stamp) {
+		return h.checkZeros(stamp)
+	}
+	return false
+}
+
+// CheckNoDate checks whether a hashcash stamp is valid ignoring date.
+func (h *Hash) CheckNoDate(stamp string) bool {
 	return h.checkZeros(stamp)
 }
 
@@ -85,4 +93,17 @@ func (h *Hash) checkZeros(stamp string) bool {
 		}
 	}
 	return true
+}
+
+func (h *Hash) checkDate(stamp string) bool {
+	fields := strings.Split(stamp, ":")
+	if len(fields) != 7 {
+		return false
+	}
+	then, err := time.Parse(dateFormat, fields[2])
+	if err != nil {
+		return false
+	}
+	duration := time.Since(then)
+	return duration.Hours()*2 <= 48
 }

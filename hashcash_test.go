@@ -9,20 +9,6 @@ import (
 	"github.com/catalinc/hashcash"
 )
 
-func TestNewStd(t *testing.T) {
-	h := hashcash.NewStd()
-	if h == nil {
-		t.Error("Expected hashcash.Hash, got nil")
-	}
-}
-
-func TestNew(t *testing.T) {
-	h := hashcash.New(uint(20), uint(16), "")
-	if h == nil {
-		t.Error("Expected hashcash.Hash, got nil")
-	}
-}
-
 var stampTests = []struct {
 	bits     uint
 	saltLen  uint
@@ -32,6 +18,7 @@ var stampTests = []struct {
 	{20, 8, "", "abc"},
 	{10, 10, "asdf", "something"},
 	{20, 10, "abc", "something"},
+	{15, 4, "", "someone@example.net"},
 }
 
 func TestStampFormat(t *testing.T) {
@@ -83,7 +70,26 @@ func TestStampFormat(t *testing.T) {
 	}
 }
 
-var mintAndCheckTests = []string{"abc", "something", "someone@example.net"}
+var checkNoDateTests = []string{
+	"1:20:161203:abc::avJyJVH5PBXhq2Xc:000000000000002fBB",
+	"1:20:161204:abc::UoUnPRS1:cde4",
+	"1:20:161205:x@example.net::EGRE+fLh:51be3",
+	"1:20:161205:someone@example.net::yNFQ2VrPkLiAlnf8:0000000000000000000000000000000000000000000HpV",
+	"1:21:161205:user@example.net::AYT8bUqziBoNN2pB:03JxO"}
+
+func TestCheckNoDate(t *testing.T) {
+	h := hashcash.NewStd()
+	for _, stamp := range checkNoDateTests {
+		if !h.CheckNoDate(stamp) {
+			t.Errorf("Failed for %s", stamp)
+		}
+	}
+}
+
+var mintAndCheckTests = []string{
+	"abc",
+	"something",
+	"someone@example.net"}
 
 func TestMintAndCheck(t *testing.T) {
 	h := hashcash.NewStd()
