@@ -1,7 +1,8 @@
 # hashcash
 
 Implementation of [Hashcash](https://en.wikipedia.org/wiki/Hashcash) version 1 in Go.
-This implementation provides an API and a command line utility (`hc`) to mint or check a Hashcash stamp.
+
+The implementation provides an API and a command line utility (`hc`) to mint or check a Hashcash stamp.
 
 # Installation
 
