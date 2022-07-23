@@ -5,10 +5,11 @@ import (
 	"crypto/rand"
 	"crypto/sha1"
 	"encoding/base64"
-	"encoding/hex"
+	"encoding/binary"
 	"fmt"
 	"hash"
 	"math"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -86,13 +87,12 @@ func (h *Hash) getSalt() (string, error) {
 func (h *Hash) checkZeros(stamp string) bool {
 	h.hasher.Reset()
 	h.hasher.Write([]byte(stamp))
-	digest := hex.EncodeToString(h.hasher.Sum(nil))
-	for i := uint(0); i < h.zeros; i++ {
-		if digest[i] != '0' {
-			return false
-		}
-	}
-	return true
+	sum := h.hasher.Sum(nil)
+	sumUint64 := binary.BigEndian.Uint64(sum)
+	sumBits := strconv.FormatUint(sumUint64, 2)
+	zeroes := 64 - len(sumBits)
+
+	return uint(zeroes) >= h.bits
 }
 
 func (h *Hash) checkDate(stamp string) bool {
