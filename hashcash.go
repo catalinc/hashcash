@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"hash"
 	"math"
-	"strconv"
+	"math/bits"
 	"strings"
 	"time"
 )
@@ -88,11 +88,8 @@ func (h *Hash) checkZeros(stamp string) bool {
 	h.hasher.Reset()
 	h.hasher.Write([]byte(stamp))
 	sum := h.hasher.Sum(nil)
-	sumUint64 := binary.BigEndian.Uint64(sum)
-	sumBits := strconv.FormatUint(sumUint64, 2)
-	zeroes := 64 - len(sumBits)
-
-	return uint(zeroes) >= h.bits
+	u64 := binary.BigEndian.Uint64(sum)
+	return uint(bits.LeadingZeros64(u64)) >= h.bits
 }
 
 func (h *Hash) checkDate(stamp string) bool {
